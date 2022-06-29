@@ -1,39 +1,34 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Diagnostics;
 using System.Text;
 
 namespace Moorhuhn_Console;
 
 public class Renderer
 {
-    public int ColumnSize { get; }
     public char[][] Pixels { get; }
 
-    public Renderer(int width, int height, int columnSize)
+    public Renderer(int width, int height)
     {
         height--;
         height--;
         width--;
-        
-        ColumnSize = columnSize;
+
         Pixels = new char[height][];
         for (int i = 0; i < Pixels.Length; i++)
         {
             Pixels[i] = new char[width];
         }
-
-        for (int y = 0; y < Math.Min(2,height); y++)
-        {
-            for (int x = 0; x < Math.Min(5,width); x++)
-            {
-                Pixels[y][x] = (char) (65+x);
-            }
-        }
     }
 
-    public void Draw()
+    public void Draw(int score, Stopwatch playTimer, TimeSpan maxPlayTime)
     {
-        Console.SetCursorPosition(0,0);
-        Console.WriteLine(String.Join("",Field()));
+        Console.SetCursorPosition(0, 0);
+        // Console.Clear();
+        var timeLeft = maxPlayTime - playTimer.Elapsed;
+        if (timeLeft.TotalMilliseconds < 0)
+            timeLeft = TimeSpan.Zero;
+        Console.WriteLine(String.Join("", Field(), $"Punktestand: {score}",
+            $"| Zeit übrig: {timeLeft.TotalMilliseconds}"));
     }
 
     private String Field()
@@ -52,6 +47,6 @@ public class Renderer
 
     private String Clear()
     {
-        return String.Join("",Pixels.Select(row => "\n").ToList());
+        return String.Join("", Pixels.Select(row => "\n").ToList());
     }
 }
